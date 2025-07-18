@@ -1,0 +1,50 @@
+.container {
+    min-height: 100vh;
+    padding: 0 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .main {
+    padding: 5rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px;
+  }
+  
+  .title {
+    margin: 0;
+    line-height: 1.15;
+    font-size: 3rem;
+    text-align: center;
+  }
+  
+  .date {
+    color: #666;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .author {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .content {
+    line-height: 1.6;
+    font-size: 1.1rem;
+  }
+  
+  .content h2 {
+    font-size: 1.8rem;
+    margin-top: 2rem;
+  }
+  
+  .content p {
+    margin: 1rem 0;
+  }
