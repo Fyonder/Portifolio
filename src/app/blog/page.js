@@ -50,7 +50,7 @@ export default async function Blog() {
       <main className={styles.projects}>
         {posts.length === 0 ? (
           <div className={styles.aboutCard}>
-            <p className={styles.sectionText}>Nenhum post encontrado. Adicione arquivos .md na pasta 'posts'.</p>
+            <p className={styles.sectionText}>Nenhum post encontrado. Adicione arquivos .md na pasta &apos;posts&apos;.</p>
           </div>
         ) : (
           <div className={styles.projectGrid}>
