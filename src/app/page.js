@@ -7,47 +7,64 @@ export default function Home() {
       <header className={styles.header}>
         <h1 className={styles.title}>Meu Portfólio</h1>
         <p className={styles.subtitle}>
-          Desenvolvedor e criador apaixonado por tecnologia e design.
+          Desenvolvedor apaixonado por criar experiências digitais incríveis ✨
         </p>
         <Link href="/blog" className={styles.button}>
-          Visitar Meu Blog
+          Confira Meu Blog
         </Link>
       </header>
 
       <section className={styles.about}>
         <h2 className={styles.sectionTitle}>Sobre Mim</h2>
-        <p className={styles.sectionText}>
-          Sou um desenvolvedor full-stack com experiência em Next.js, React e design de interfaces modernas. Adoro criar projetos que combinam funcionalidade e estética, sempre buscando soluções inovadoras.
-        </p>
+        <div className={styles.aboutCard}>
+          <p className={styles.sectionText}>
+            Sou um desenvolvedor full-stack que vive para transformar ideias em código. Especializado em Next.js, React e design de interfaces, crio projetos que combinam inovação, funcionalidade e um toque de criatividade. Sempre pronto para o próximo desafio!
+          </p>
+        </div>
       </section>
 
       <section className={styles.projects}>
-        <h2 className={styles.sectionTitle}>Projetos</h2>
+        <h2 className={styles.sectionTitle}>Meus Projetos</h2>
         <div className={styles.projectGrid}>
           <div className={styles.projectCard}>
-            <h3 className={styles.projectTitle}>Projeto 1</h3>
+            <h3 className={styles.projectTitle}>Aplicação de Clima</h3>
             <p className={styles.projectDescription}>
-              Criando uma Aplicação de Clima com React Web.
+              App interativa de clima com React, design vibrante e dados em tempo real.
             </p>
-            <a href="https://github.com/Fyonder/temp" target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+            <a
+              href="https://github.com/Fyonder/temp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.projectLink}
+            >
               Ver no GitHub
             </a>
           </div>
           <div className={styles.projectCard}>
-            <h3 className={styles.projectTitle}>Projeto 2</h3>
+            <h3 className={styles.projectTitle}>Gerador de Senhas</h3>
             <p className={styles.projectDescription}>
-              Um gerador de senhas simples, com opções de tamanho e caracteres especiais.
+              Ferramenta segura para gerar senhas personalizáveis com opções avançadas.
             </p>
-            <a href="https://github.com/Fyonder/gerador" target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+            <a
+              href="https://github.com/Fyonder/gerador"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.projectLink}
+            >
               Ver no GitHub
             </a>
           </div>
           <div className={styles.projectCard}>
-            <h3 className={styles.projectTitle}>Projeto 3</h3>
+            <h3 className={styles.projectTitle}>Portfólio Pessoal</h3>
             <p className={styles.projectDescription}>
-              Um site estático hospedado na Vercel, com design responsivo e animações modernas.
+              Site estático na Vercel com design responsivo e animações fluidas.
             </p>
-            <a href="https://github.com/Fyonder/Portifolio" target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+            <a
+              href="https://github.com/Fyonder/Portifolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.projectLink}
+            >
               Ver no GitHub
             </a>
           </div>
@@ -59,5 +76,5 @@ export default function Home() {
 
 export const metadata = {
   title: 'Meu Portfólio',
-  description: 'Portfólio pessoal com projetos incríveis e um blog, criado com Next.js',
+  description: 'Portfólio pessoal vibrante com projetos criativos e blog, construído com Next.js',
 };

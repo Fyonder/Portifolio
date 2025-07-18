@@ -43,20 +43,22 @@ export default async function Blog() {
 
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
+      <header className={styles.header}>
         <h1 className={styles.title}>Meu Blog</h1>
-
+        <p className={styles.subtitle}>Explore minhas ideias e projetos mais recentes ✨</p>
+      </header>
+      <main className={styles.projects}>
         {posts.length === 0 ? (
-          <div className={styles.noPosts}>
-            <p>Nenhum post encontrado. Adicione arquivos .md na pasta &apos;posts&apos;.</p>
+          <div className={styles.aboutCard}>
+            <p className={styles.sectionText}>Nenhum post encontrado. Adicione arquivos .md na pasta 'posts'.</p>
           </div>
         ) : (
-          <div className={styles.grid}>
+          <div className={styles.projectGrid}>
             {posts.map((post) => (
               <Link href={`/posts/${post.slug}`} key={post.slug}>
-                <div className={styles.card}>
-                  <h2 className={styles.cardTitle}>{post.title}</h2>
-                  <p className={styles.excerpt}>{post.excerpt}</p>
+                <div className={styles.projectCard}>
+                  <h2 className={styles.projectTitle}>{post.title}</h2>
+                  <p className={styles.projectDescription}>{post.excerpt}</p>
                   <p className={styles.date}>{post.date}</p>
                 </div>
               </Link>
@@ -70,5 +72,5 @@ export default async function Blog() {
 
 export const metadata = {
   title: 'Meu Blog',
-  description: 'Um blog simples criado com Next.js',
+  description: 'Um blog vibrante com ideias e projetos, criado com Next.js',
 };
