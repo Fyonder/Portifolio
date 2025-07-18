@@ -4,7 +4,6 @@ import matter from 'gray-matter';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import styles from '../../styles/Post.module.css';
 
-
 // Caminho para a pasta de posts
 const postsDirectory = path.join(process.cwd(), 'posts');
 
@@ -49,7 +48,6 @@ export async function generateStaticParams() {
 }
 
 export default async function Post({ params }) {
-  // Aguardar a resolução de params
   const { slug } = await params;
   const post = await getPost(slug);
 
@@ -58,7 +56,7 @@ export default async function Post({ params }) {
       <div className={styles.container}>
         <main className={styles.main}>
           <h1 className={styles.title}>Post não encontrado</h1>
-          <p>Verifique se o arquivo Markdown existe na pasta 'posts'.</p>
+          <p>Verifique se o arquivo Markdown existe na pasta &#39;posts&#39;.</p>
         </main>
       </div>
     );
@@ -80,9 +78,7 @@ export default async function Post({ params }) {
   );
 }
 
-// Metadados dinâmicos para SEO
 export async function generateMetadata({ params }) {
-  // Aguardar a resolução de params
   const { slug } = await params;
   const post = await getPost(slug);
 

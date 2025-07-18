@@ -56,7 +56,7 @@ export default async function Post({ params }) {
       <div className={styles.container}>
         <main className={styles.main}>
           <h1 className={styles.title}>Post não encontrado</h1>
-          <p>Verifique se o arquivo Markdown existe na pasta 'posts'.</p>
+          <p>Verifique se o arquivo Markdown existe na pasta &#39;posts&#39;.</p>
         </main>
       </div>
     );

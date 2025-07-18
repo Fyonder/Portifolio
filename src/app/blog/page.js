@@ -48,7 +48,7 @@ export default async function Blog() {
 
         {posts.length === 0 ? (
           <div className={styles.noPosts}>
-            <p>Nenhum post encontrado. Adicione arquivos .md na pasta 'posts'.</p>
+            <p>Nenhum post encontrado. Adicione arquivos .md na pasta &apos;posts&apos;.</p>
           </div>
         ) : (
           <div className={styles.grid}>
