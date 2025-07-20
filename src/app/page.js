@@ -5,13 +5,20 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Filipe Souza</h1>
+        <Link href="/auuii" className={styles.title}>
+        Filipe Souza
+          </Link>
         <p className={styles.subtitle}>
           Desenvolvedor apaixonado por criar experiências digitais incríveis ✨
         </p>
         <Link href="/blog" className={styles.button}>
-          Confira Meu Blog
+          Confira Blog
         </Link>
+
+        <Link href="/contato" className={styles.button}>
+            Entre em Contato
+          </Link>
+
       </header>
 
       <section className={styles.about}>

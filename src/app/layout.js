@@ -2,8 +2,8 @@ import './globals.css';
 import VercelSpeedInsights from './components/VercelSpeedInsights';
 
 export const metadata = {
-  title: 'Meu Blog',
-  description: 'Um blog simples criado com Next.js',
+  title: 'Filipe Souza',
+  description: 'Um Portifolio simples criado com Next.js',
 };
 
 export default function RootLayout({ children }) {
