@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Meu Portfólio</h1>
+        <h1 className={styles.title}>Filipe Souza</h1>
         <p className={styles.subtitle}>
           Desenvolvedor apaixonado por criar experiências digitais incríveis ✨
         </p>
@@ -26,6 +26,22 @@ export default function Home() {
       <section className={styles.projects}>
         <h2 className={styles.sectionTitle}>Meus Projetos</h2>
         <div className={styles.projectGrid}>
+        
+        <div className={styles.projectCard}>
+            <h3 className={styles.projectTitle}>Auuii Delivery</h3>
+            <p className={styles.projectDescription}>
+              Plataforma de delivery em React e Next.js, com design moderno e funcionalidades avançadas.
+            </p>
+            <a
+              href="https://auuii-painel.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.projectLink}
+            >
+              Ver
+            </a>
+          </div>
+
           <div className={styles.projectCard}>
             <h3 className={styles.projectTitle}>Aplicação de Clima</h3>
             <p className={styles.projectDescription}>
