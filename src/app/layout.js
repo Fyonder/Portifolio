@@ -1,5 +1,5 @@
 import './globals.css';
-import VercelSpeedInsights from './components/VercelSpeedInsights'
+import VercelSpeedInsights from './components/VercelSpeedInsights';
 
 export const metadata = {
   title: 'Meu Blog',

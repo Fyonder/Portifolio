@@ -1,7 +1,7 @@
-'use client'; // Marca como componente cliente
+'use client';
 
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export default function VercelSpeedInsights() {
-  return <SpeedInsights />;
+  return <SpeedInsights sampleRate={1} />;
 }
