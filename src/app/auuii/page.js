@@ -26,13 +26,14 @@ export default function RestaurantDashboard() {
     if (isAuthenticated) {
       const fetchData = async () => {
         try {
-          const response = await fetch('https://ifood.onrender.com/merchants');
-          if (!response.ok) throw new Error('Erro ao buscar dados');
+          const response = await fetch('https://ifood.onrender.com/dashboard/data');
+          if (!response.ok) throw new Error('Erro ao buscar dados do dashboard');
           const result = await response.json();
-          setData(result);
+          if (!result.success) throw new Error(result.message || 'Erro na resposta da API');
+          setData(result.data);
           setLoading(false);
         } catch (err) {
-          setError('Falha ao carregar dados da API');
+          setError('Falha ao carregar dados da API: ' + err.message);
           setLoading(false);
         }
       };
@@ -124,15 +125,24 @@ export default function RestaurantDashboard() {
     );
   }
 
-  // Função para garantir valores padrão
+  // Dados seguros com valores padrão
   const safeData = {
-    hasMenu: data?.hasMenu || false,
-    menuItems: data?.menuItems || [],
-    hasDelivery: data?.hasDelivery || false,
-    routes: data?.routes || [],
-    pendingOrders: data?.pendingOrders || 0,
-    merchantCount: Array.isArray(data) ? data.length : (data?.merchantCount || 0),
-    merchants: Array.isArray(data) ? data : (data?.merchants || [])
+    merchants: data?.merchants || [],
+    orders: data?.orders || [],
+    users: data?.users || [],
+    statistics: data?.statistics || {
+      totalMerchants: 0,
+      totalOrders: 0,
+      totalUsers: 0,
+      totalRevenue: 0,
+      ordersToday: 0,
+      ordersThisMonth: 0,
+      averageOrderValue: 0,
+      ordersByStatus: {},
+      activeMerchants: 0,
+      activeUsers: 0,
+      averageRevenuePerMerchant: 0,
+    },
   };
 
   return (
@@ -152,36 +162,33 @@ export default function RestaurantDashboard() {
         <div className={styles.projects}>
           <div className={styles.projectGrid}>
             <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Cardápio</h2>
+              <h2 className={styles.projectTitle}>Merchants</h2>
               <p className={styles.projectDescription}>
-                {safeData.hasMenu
-                  ? `Disponível (${safeData.menuItems.length} itens)`
-                  : 'Não disponível'}
+                {safeData.statistics.totalMerchants} merchant(s)
               </p>
-              {safeData.hasMenu && safeData.menuItems.length > 0 && (
+              {safeData.merchants.length > 0 && (
                 <div className={styles.sectionText}>
                   <ul>
-                    {safeData.menuItems.map((item, index) => (
-                      <li key={index}>
-                        {typeof item === 'string' ? item : item?.name || `Item ${index + 1}`}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            
-            <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Corridas</h2>
-              <p className={styles.projectDescription}>
-                {safeData.hasDelivery ? 'Entregas ativas' : 'Sem entregas'}
-              </p>
-              {safeData.hasDelivery && safeData.routes.length > 0 && (
-                <div className={styles.sectionText}>
-                  <ul>
-                    {safeData.routes.map((route, index) => (
-                      <li key={index}>
-                        {typeof route === 'string' ? route : `Rota ${index + 1}`}
+                    {safeData.merchants.map((merchant) => (
+                      <li key={merchant.id}>
+                        <div>
+                          <strong>{merchant.name || 'Sem nome'}</strong>
+                          {merchant.details?.description && (
+                            <p>Descrição: {merchant.details.description}</p>
+                          )}
+                          {merchant.details?.cidade && (
+                            <p>Cidade: {merchant.details.cidade}</p>
+                          )}
+                          {merchant.details?.address && (
+                            <p>Endereço: {merchant.details.address}</p>
+                          )}
+                          {merchant.details?.status && (
+                            <p>Status: {merchant.details.status}</p>
+                          )}
+                          {merchant.details?.averageTicket && (
+                            <p>Ticket Médio: R${merchant.details.averageTicket.toFixed(2)}</p>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -192,31 +199,66 @@ export default function RestaurantDashboard() {
             <div className={styles.projectCard}>
               <h2 className={styles.projectTitle}>Pedidos</h2>
               <p className={styles.projectDescription}>
-                {safeData.pendingOrders} pedido(s) pendente(s)
+                {safeData.statistics.totalOrders} pedido(s) no total
               </p>
+              <div className={styles.sectionText}>
+                <p>Pedidos Hoje: {safeData.statistics.ordersToday}</p>
+                <p>Pedidos este Mês: {safeData.statistics.ordersThisMonth}</p>
+                <p>Receita Total: R${safeData.statistics.totalRevenue.toFixed(2)}</p>
+                <p>Valor Médio por Pedido: R${safeData.statistics.averageOrderValue.toFixed(2)}</p>
+                {Object.keys(safeData.statistics.ordersByStatus).length > 0 && (
+                  <div>
+                    <p>Pedidos por Status:</p>
+                    <ul>
+                      {Object.entries(safeData.statistics.ordersByStatus).map(([status, count]) => (
+                        <li key={status}>
+                          {status}: {count}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Merchants</h2>
+              <h2 className={styles.projectTitle}>Usuários</h2>
               <p className={styles.projectDescription}>
-                {safeData.merchantCount} merchant(s)
+                {safeData.statistics.totalUsers} usuário(s)
               </p>
-              {safeData.merchants.length > 0 && (
+              {safeData.users.length > 0 && (
                 <div className={styles.sectionText}>
                   <ul>
-                    {safeData.merchants.map((merchant, index) => (
-                      <li key={merchant.id || index}>
+                    {safeData.users.map((user) => (
+                      <li key={user.id}>
                         <div>
-                          <strong>{merchant.name || `Merchant ${index + 1}`}</strong>
-                          {merchant.description && <p>{merchant.description}</p>}
-                          {merchant.city && <p>Cidade: {merchant.city}</p>}
-                          {merchant.address && <p>Endereço: {merchant.address}</p>}
+                          <strong>{user.name || 'Sem nome'}</strong>
+                          {user.email && <p>Email: {user.email}</p>}
+                          {user.cidade && <p>Cidade: {user.cidade}</p>}
+                          {user.estado && <p>Estado: {user.estado}</p>}
+                          {user.plan && <p>Plano: {user.plan}</p>}
+                          {user.openingHours && (
+                            <p>
+                              Horário: {user.openingHours.openHour}:{user.openingHours.openMinute} -{' '}
+                              {user.openingHours.closeHour}:{user.openingHours.closeMinute} (
+                              {user.openingHours.days})
+                            </p>
+                          )}
                         </div>
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
+            </div>
+            
+            <div className={styles.projectCard}>
+              <h2 className={styles.projectTitle}>Estatísticas</h2>
+              <div className={styles.sectionText}>
+                <p>Merchants Ativos: {safeData.statistics.activeMerchants}</p>
+                <p>Usuários Ativos: {safeData.statistics.activeUsers}</p>
+                <p>Receita Média por Merchant: R${safeData.statistics.averageRevenuePerMerchant.toFixed(2)}</p>
+              </div>
             </div>
           </div>
         </div>

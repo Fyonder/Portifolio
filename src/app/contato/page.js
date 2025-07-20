@@ -15,10 +15,10 @@ export default function Contato() {
           <h2 className={styles.sectionTitle}>Informações de Contato</h2>
           <div className={styles.contactInfo}>
             <p className={styles.sectionText}>
-              📧 Email: filipe@exemplo.com
+              📧 Email: carlosfilipdesouza@gmail.com
             </p>
             <p className={styles.sectionText}>
-              💼 LinkedIn: /in/filipe-souza
+              💼 LinkedIn: /in/filipe-souza-09a213235/
             </p>
             <p className={styles.sectionText}>
               🐙 GitHub: github.com/Fyonder
