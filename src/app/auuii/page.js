@@ -1,13 +1,40 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css';
 import styles from '../styles/Home.module.css';
+
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
+
+// Custom icons
+const createIcon = (color) => {
+  if (typeof window !== 'undefined') {
+    const L = require('leaflet');
+    return new L.Icon({
+      iconUrl: `data:image/svg+xml;base64,${btoa(`
+        <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.5 0C5.596 0 0 5.596 0 12.5c0 10.5 12.5 28.5 12.5 28.5s12.5-18 12.5-28.5C25 5.596 19.404 0 12.5 0z" fill="${color}"/>
+          <circle cx="12.5" cy="12.5" r="5" fill="white"/>
+        </svg>
+      `)}`,
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+    });
+  }
+  return null;
+};
 
 export default function RestaurantDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
@@ -43,12 +70,13 @@ export default function RestaurantDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === SECRET_PASSWORD) {
+    if (username === 'admin' && password === SECRET_PASSWORD) {
       setIsAuthenticated(true);
       sessionStorage.setItem('dashboard_auth', 'authenticated');
       setAuthError('');
     } else {
-      setAuthError('Senha incorreta!');
+      setAuthError('Usuário ou senha incorretos!');
+      setUsername('');
       setPassword('');
     }
   };
@@ -77,6 +105,17 @@ export default function RestaurantDashboard() {
           <div className={styles.about}>
             <div className={styles.aboutCard}>
               <form onSubmit={handleLogin} className={styles.contactForm}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="username">Usuário:</label>
+                  <input
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Digite seu usuário"
+                    required
+                  />
+                </div>
                 <div className={styles.formGroup}>
                   <label htmlFor="password">Senha:</label>
                   <input
@@ -130,10 +169,12 @@ export default function RestaurantDashboard() {
     merchants: data?.merchants || [],
     orders: data?.orders || [],
     users: data?.users || [],
+    current: data?.current || [],
     statistics: data?.statistics || {
       totalMerchants: 0,
       totalOrders: 0,
       totalUsers: 0,
+      totalCurrent: 0,
       totalRevenue: 0,
       ordersToday: 0,
       ordersThisMonth: 0,
@@ -142,6 +183,9 @@ export default function RestaurantDashboard() {
       activeMerchants: 0,
       activeUsers: 0,
       averageRevenuePerMerchant: 0,
+      onlineMotoboys: 0,
+      offlineMotoboys: 0,
+      percentOnline: 0,
     },
   };
 
@@ -162,102 +206,129 @@ export default function RestaurantDashboard() {
         <div className={styles.projects}>
           <div className={styles.projectGrid}>
             <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Merchants</h2>
-              <p className={styles.projectDescription}>
-                {safeData.statistics.totalMerchants} merchant(s)
-              </p>
-              {safeData.merchants.length > 0 && (
-                <div className={styles.sectionText}>
-                  <ul>
-                    {safeData.merchants.map((merchant) => (
-                      <li key={merchant.id}>
-                        <div>
-                          <strong>{merchant.name || 'Sem nome'}</strong>
-                          {merchant.details?.description && (
-                            <p>Descrição: {merchant.details.description}</p>
-                          )}
-                          {merchant.details?.cidade && (
-                            <p>Cidade: {merchant.details.cidade}</p>
-                          )}
-                          {merchant.details?.address && (
-                            <p>Endereço: {merchant.details.address}</p>
-                          )}
-                          {merchant.details?.status && (
-                            <p>Status: {merchant.details.status}</p>
-                          )}
-                          {merchant.details?.averageTicket && (
-                            <p>Ticket Médio: R${merchant.details.averageTicket.toFixed(2)}</p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            
-            <div className={styles.projectCard}>
               <h2 className={styles.projectTitle}>Pedidos</h2>
               <p className={styles.projectDescription}>
                 {safeData.statistics.totalOrders} pedido(s) no total
               </p>
               <div className={styles.sectionText}>
-                <p>Pedidos Hoje: {safeData.statistics.ordersToday}</p>
-                <p>Pedidos este Mês: {safeData.statistics.ordersThisMonth}</p>
-                <p>Receita Total: R${safeData.statistics.totalRevenue.toFixed(2)}</p>
-                <p>Valor Médio por Pedido: R${safeData.statistics.averageOrderValue.toFixed(2)}</p>
-                {Object.keys(safeData.statistics.ordersByStatus).length > 0 && (
-                  <div>
-                    <p>Pedidos por Status:</p>
-                    <ul>
-                      {Object.entries(safeData.statistics.ordersByStatus).map(([status, count]) => (
-                        <li key={status}>
-                          {status}: {count}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <p>Hoje: {safeData.statistics.ordersToday}</p>
+                <p>Este Mês: {safeData.statistics.ordersThisMonth}</p>
+                <p>Receita: R${safeData.statistics.totalRevenue.toFixed(2)}</p>
+                <p>Médio: R${safeData.statistics.averageOrderValue.toFixed(2)}</p>
               </div>
             </div>
-            
+
             <div className={styles.projectCard}>
               <h2 className={styles.projectTitle}>Usuários</h2>
               <p className={styles.projectDescription}>
                 {safeData.statistics.totalUsers} usuário(s)
               </p>
-              {safeData.users.length > 0 && (
-                <div className={styles.sectionText}>
+              <div className={styles.sectionText}>
+                <p>Ativos: {safeData.statistics.activeUsers}</p>
+              </div>
+            </div>
+
+            <div className={styles.projectCard}>
+              <h2 className={styles.projectTitle}>Estatísticas</h2>
+              <div className={styles.sectionText}>
+                <p>Receita Média/Merchant: R${safeData.statistics.averageRevenuePerMerchant.toFixed(2)}</p>
+                <p>Motoboys Online: {safeData.statistics.onlineMotoboys}</p>
+                <p>Motoboys Offline: {safeData.statistics.offlineMotoboys}</p>
+                <p>Percentual Online: {safeData.statistics.percentOnline}%</p>
+              </div>
+            </div>
+
+            <div className={styles.projectCard}>
+              <h2 className={styles.projectTitle}>Current</h2>
+              <p className={styles.projectDescription}>
+                {safeData.current.length} motoboy(s)
+              </p>
+              {safeData.current.length > 0 && (
+                <div className={styles.sectionText} style={{ maxHeight: '200px', overflowY: 'auto' }}>
                   <ul>
-                    {safeData.users.map((user) => (
-                      <li key={user.id}>
+                    {safeData.current.slice(0, 10).map((item) => (
+                      <li key={item.id} style={{ marginBottom: '8px' }}>
                         <div>
-                          <strong>{user.name || 'Sem nome'}</strong>
-                          {user.email && <p>Email: {user.email}</p>}
-                          {user.cidade && <p>Cidade: {user.cidade}</p>}
-                          {user.estado && <p>Estado: {user.estado}</p>}
-                          {user.plan && <p>Plano: {user.plan}</p>}
-                          {user.openingHours && (
-                            <p>
-                              Horário: {user.openingHours.openHour}:{user.openingHours.openMinute} -{' '}
-                              {user.openingHours.closeHour}:{user.openingHours.closeMinute} (
-                              {user.openingHours.days})
-                            </p>
-                          )}
+                          <strong>{item.name || 'Sem nome'}</strong> - {item.online ? 'Online' : 'Offline'}
+                          {item.saldo && <span> | Saldo: R${item.saldo}</span>}
                         </div>
                       </li>
                     ))}
                   </ul>
+                  {safeData.current.length > 10 && <p>... e mais {safeData.current.length - 10}</p>}
                 </div>
               )}
             </div>
-            
-            <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Estatísticas</h2>
-              <div className={styles.sectionText}>
-                <p>Merchants Ativos: {safeData.statistics.activeMerchants}</p>
-                <p>Usuários Ativos: {safeData.statistics.activeUsers}</p>
-                <p>Receita Média por Merchant: R${safeData.statistics.averageRevenuePerMerchant.toFixed(2)}</p>
+
+
+
+            <div className={styles.projectCard} style={{ gridColumn: 'span 2' }}>
+              <h2 className={styles.projectTitle}>Mapa de Localizações</h2>
+              <div style={{ height: '400px', width: '100%' }}>
+                <MapContainer
+                  center={[-23.5505, -46.6333]}
+                  zoom={10}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {/* Markers for current motoboys */}
+                  {safeData.current
+                    .filter(item => item.location && typeof item.location.lat === 'number' && typeof item.location.lng === 'number')
+                    .map((item) => (
+                      <Marker
+                        key={item.id}
+                        position={[item.location.lat, item.location.lng]}
+                        icon={createIcon(item.online ? '#00ff00' : '#ff0000')}
+                      >
+                        <Popup>
+                          <strong>{item.name || 'Motoboy'}</strong><br />
+                          Status: {item.online ? 'Online' : 'Offline'}<br />
+                          {item.saldo && `Saldo: R$${item.saldo}`}<br />
+                          {item.placa && `Placa: ${item.placa}`}
+                        </Popup>
+                      </Marker>
+                    ))}
+
+                  {/* Markers for users with location */}
+                  {safeData.users
+                    .filter(user => user.location && typeof user.location.lat === 'number' && typeof user.location.lng === 'number')
+                    .map((user) => (
+                      <Marker
+                        key={user.id}
+                        position={[user.location.lat, user.location.lng]}
+                        icon={createIcon(user.role === 'motoboy' ? (user.online ? '#00ff00' : '#ff0000') : '#ffa500')}
+                      >
+                        <Popup>
+                          <strong>{user.name || (user.role === 'motoboy' ? 'Motoboy' : 'Restaurante')}</strong><br />
+                          {user.role === 'motoboy' ? (
+                            <>
+                              Status: {user.online ? 'Online' : 'Offline'}<br />
+                              {user.saldo && `Saldo: R$${user.saldo}`}<br />
+                              {user.placa && `Placa: ${user.placa}`}<br />
+                              {user.Historico && user.Historico.length > 0 && (
+                                <div>
+                                  <br /><strong>Histórico:</strong>
+                                  <ul>
+                                    {user.Historico.slice(0, 5).map((hist, idx) => (
+                                      <li key={idx}>{hist}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              {user.cidade && `Cidade: ${user.cidade}`}<br />
+                              {user.logradouro && `Endereço: ${user.logradouro}`}
+                            </>
+                          )}
+                        </Popup>
+                      </Marker>
+                    ))}
+                </MapContainer>
               </div>
             </div>
           </div>
