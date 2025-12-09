@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
@@ -38,8 +38,8 @@ export default function RestaurantDashboard() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
-  // Sua senha secreta - mude para algo seguro
-  const SECRET_PASSWORD = '123456789';
+  // Senha secreta obtida do ambiente
+  const SECRET_PASSWORD = process.env.NEXT_PUBLIC_SECRET_PASSWORD || 'your_secure_password_here';
 
   useEffect(() => {
     // Verifica se já está autenticado no sessionStorage
@@ -70,7 +70,7 @@ export default function RestaurantDashboard() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === SECRET_PASSWORD) {
+    if (username === process.env.NEXT_PUBLIC_ADMIN_USERNAME && password === SECRET_PASSWORD) {
       setIsAuthenticated(true);
       sessionStorage.setItem('dashboard_auth', 'authenticated');
       setAuthError('');
@@ -221,11 +221,26 @@ export default function RestaurantDashboard() {
             <div className={styles.projectCard}>
               <h2 className={styles.projectTitle}>Usuários</h2>
               <p className={styles.projectDescription}>
-                {safeData.statistics.totalUsers} usuário(s)
+                {safeData.users.length} usuário(s)
               </p>
-              <div className={styles.sectionText}>
-                <p>Ativos: {safeData.statistics.activeUsers}</p>
-              </div>
+              {safeData.users.length > 0 && (
+                <div className={styles.sectionText} style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  <ul>
+                    {safeData.users.slice(0, 10).map((user) => {
+                      // Limpa o nome removendo sufixos de status
+                      const cleanName = (user.name || 'Sem nome').replace(/ - (Online|Offline)$/i, '');
+                      return (
+                        <li key={user.id} style={{ marginBottom: '8px' }}>
+                          <div>
+                            <strong>{cleanName}</strong>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {safeData.users.length > 10 && <p>... e mais {safeData.users.length - 10}</p>}
+                </div>
+              )}
             </div>
 
             <div className={styles.projectCard}>
@@ -304,7 +319,7 @@ export default function RestaurantDashboard() {
                         <Popup>
                           <strong>{user.name || (user.role === 'motoboy' ? 'Motoboy' : 'Restaurante')}</strong><br />
                           {user.role === 'motoboy' ? (
-                            <>
+                            <div style={{ display: 'contents' }}>
                               Status: {user.online ? 'Online' : 'Offline'}<br />
                               {user.saldo && `Saldo: R$${user.saldo}`}<br />
                               {user.placa && `Placa: ${user.placa}`}<br />
@@ -312,18 +327,18 @@ export default function RestaurantDashboard() {
                                 <div>
                                   <br /><strong>Histórico:</strong>
                                   <ul>
-                                    {user.Historico.slice(0, 5).map((hist, idx) => (
+                                    {user.Historico.slice(0, 5).map((hist, idx) =>
                                       <li key={idx}>{hist}</li>
-                                    ))}
+                                    )}
                                   </ul>
                                 </div>
                               )}
-                            </>
+                            </div>
                           ) : (
-                            <>
+                            <div style={{ display: 'contents' }}>
                               {user.cidade && `Cidade: ${user.cidade}`}<br />
                               {user.logradouro && `Endereço: ${user.logradouro}`}
-                            </>
+                            </div>
                           )}
                         </Popup>
                       </Marker>
