@@ -78,6 +78,20 @@ export default function Home() {
             </a>
           </div>
           <div className={styles.projectCard}>
+            <h3 className={styles.projectTitle}>Hey-Cris</h3>
+            <p className={styles.projectDescription}>
+              Assistente de inteligência artificial desenvolvido em Electron com interface moderna e recursos avançados de IA.
+            </p>
+            <a
+              href="https://github.com/Fyonder/Hey-Cris"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.projectLink}
+            >
+              Ver no GitHub
+            </a>
+          </div>
+          <div className={styles.projectCard}>
             <h3 className={styles.projectTitle}>Portfólio Pessoal</h3>
             <p className={styles.projectDescription}>
               Site estático na Vercel com design responsivo e animações fluidas.

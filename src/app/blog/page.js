@@ -46,6 +46,9 @@ export default async function Blog() {
       <header className={styles.header}>
         <h1 className={styles.title}>Meu Blog</h1>
         <p className={styles.subtitle}>Explore minhas ideias e projetos mais recentes ✨</p>
+        <Link href="/blog/novo" className={styles.button}>
+          + Criar Novo Artigo
+        </Link>
       </header>
       <main className={styles.projects}>
         {posts.length === 0 ? (
