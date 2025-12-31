@@ -101,7 +101,7 @@ export default function RestaurantDashboard() {
             <h1 className={styles.title}>Acesso Restrito</h1>
             <p className={styles.subtitle}>Digite a senha para acessar o Dashboard Auuii</p>
           </div>
-          
+
           <div className={styles.about}>
             <div className={styles.aboutCard}>
               <form onSubmit={handleLogin} className={styles.contactForm}>
@@ -202,55 +202,62 @@ export default function RestaurantDashboard() {
             Sair
           </button>
         </div>
-        
+
         <div className={styles.projects}>
           <div className={styles.projectGrid}>
             <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Pedidos</h2>
+              <h2 className={styles.projectTitle}>Merchants & Pedidos</h2>
               <p className={styles.projectDescription}>
-                {safeData.statistics.totalOrders} pedido(s) no total
+                {safeData.statistics.totalMerchants} merchant(s) | {safeData.statistics.totalOrders} pedido(s) total
               </p>
               <div className={styles.sectionText}>
-                <p>Hoje: {safeData.statistics.ordersToday}</p>
-                <p>Este Mês: {safeData.statistics.ordersThisMonth}</p>
-                <p>Receita: R${safeData.statistics.totalRevenue.toFixed(2)}</p>
-                <p>Médio: R${safeData.statistics.averageOrderValue.toFixed(2)}</p>
+                <p>Receita Total: R${safeData.statistics.totalRevenue.toFixed(2)}</p>
+                <p>Pedidos Hoje: {safeData.statistics.ordersToday} | Este Mês: {safeData.statistics.ordersThisMonth}</p>
+                {safeData.merchants.length > 0 && (() => {
+                  return (
+                    <div style={{ maxHeight: '180px', overflowY: 'auto', marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '10px' }}>
+                      <strong>Merchants:</strong>
+                      <ul style={{ marginTop: '5px' }}>
+                        {safeData.merchants.map((merchant) => {
+                          // Tenta diferentes campos para ligar pedidos ao merchant
+                          const merchantOrders = safeData.orders.filter(order =>
+                            order.merchantId === merchant.id ||
+                            order.merchantId === merchant.ifoodMerchantId ||
+                            order.merchant?.id === merchant.id ||
+                            order.restaurantId === merchant.id ||
+                            order.storeId === merchant.id
+                          );
+
+                          // Se não encontrou com filtro, mostra todos os pedidos
+                          const ordersToShow = merchantOrders.length > 0 ? merchantOrders : safeData.orders;
+                          const totalRevenue = ordersToShow.reduce((sum, o) => sum + (o.total || 0), 0);
+
+                          return (
+                            <li key={merchant.id} style={{ fontSize: '0.9em', marginBottom: '8px', lineHeight: '1.4' }}>
+                              <div>
+                                <strong>{merchant.name || merchant.id}</strong>
+                                <div style={{ fontSize: '0.85em', color: '#b0b0b0', marginTop: '2px' }}>
+                                  📦 {ordersToShow.length} pedido(s)
+                                  {ordersToShow.length > 0 && (
+                                    <span> | R${totalRevenue.toFixed(2)}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
             <div className={styles.projectCard}>
               <h2 className={styles.projectTitle}>Usuários</h2>
               <p className={styles.projectDescription}>
-                {safeData.users.length} usuário(s)
+                {safeData.statistics.totalUsers} usuário(s) no total
               </p>
-              {safeData.users.length > 0 && (
-                <div className={styles.sectionText} style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                  <ul>
-                    {safeData.users.slice(0, 10).map((user) => {
-                      // Limpa o nome removendo sufixos de status
-                      const cleanName = (user.name || 'Sem nome').replace(/ - (Online|Offline)$/i, '');
-                      return (
-                        <li key={user.id} style={{ marginBottom: '8px' }}>
-                          <div>
-                            <strong>{cleanName}</strong>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  {safeData.users.length > 10 && <p>... e mais {safeData.users.length - 10}</p>}
-                </div>
-              )}
-            </div>
-
-            <div className={styles.projectCard}>
-              <h2 className={styles.projectTitle}>Estatísticas</h2>
-              <div className={styles.sectionText}>
-                <p>Receita Média/Merchant: R${safeData.statistics.averageRevenuePerMerchant.toFixed(2)}</p>
-                <p>Motoboys Online: {safeData.statistics.onlineMotoboys}</p>
-                <p>Motoboys Offline: {safeData.statistics.offlineMotoboys}</p>
-                <p>Percentual Online: {safeData.statistics.percentOnline}%</p>
-              </div>
             </div>
 
             <div className={styles.projectCard}>
@@ -279,70 +286,160 @@ export default function RestaurantDashboard() {
 
             <div className={styles.projectCard} style={{ gridColumn: 'span 2' }}>
               <h2 className={styles.projectTitle}>Mapa de Localizações</h2>
+              <p className={styles.projectDescription} style={{ marginBottom: '0.5rem' }}>
+                Visualização em tempo real de merchants, motoboys e restaurantes
+              </p>
+              {(() => {
+                // Função auxiliar para verificar se tem localização válida
+                const hasValidLocation = (item) => {
+                  if (!item.location) return false;
+                  const lat = item.location.lat ?? item.location.latitude;
+                  const lng = item.location.lng ?? item.location.longitude;
+                  return typeof lat === 'number' && typeof lng === 'number';
+                };
+
+                // Filtrando apenas os que têm localização válida
+                const merchantsWithLocation = safeData.merchants.filter(hasValidLocation);
+                const currentWithLocation = safeData.current.filter(hasValidLocation);
+                const usersWithLocation = safeData.users.filter(hasValidLocation);
+
+                // Contando motoboys online/offline usando o array 'current'
+                const motoboysOnline = currentWithLocation.filter(m => m.online === true).length;
+                const motoboysOffline = currentWithLocation.filter(m => m.online === false).length;
+
+                // Debug: verifica status dos motoboys
+                console.log('🏍️ Motoboys com localização:', currentWithLocation.map(m => ({
+                  nome: m.name,
+                  online: m.online,
+                  id: m.id
+                })));
+
+                // Total único (evitando duplicação entre current e users)
+                const allIds = new Set([
+                  ...merchantsWithLocation.map(m => m.id),
+                  ...currentWithLocation.map(m => m.id),
+                  ...usersWithLocation.map(m => m.id)
+                ]);
+                const totalNoMapa = allIds.size;
+
+                return (
+                  <div style={{ marginBottom: '10px', display: 'flex', gap: '15px', flexWrap: 'wrap', fontSize: '0.85em', color: '#e0e0e0' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      🔵 <strong>Merchants:</strong> {merchantsWithLocation.length}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      🟢 <strong>Motoboys Online:</strong> {motoboysOnline}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      🔴 <strong>Motoboys Offline:</strong> {motoboysOffline}
+                    </span>
+                    <span style={{ marginLeft: 'auto', fontStyle: 'italic', opacity: 0.7 }}>
+                      Total no mapa: {totalNoMapa}
+                    </span>
+                  </div>
+                );
+              })()}
               <div style={{ height: '400px', width: '100%' }}>
                 <MapContainer
-                  center={[-23.5505, -46.6333]}
-                  zoom={10}
+                  center={[-23.394, -51.911]}
+                  zoom={12}
                   style={{ height: '100%', width: '100%' }}
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   />
-                  {/* Markers for current motoboys */}
-                  {safeData.current
-                    .filter(item => item.location && typeof item.location.lat === 'number' && typeof item.location.lng === 'number')
-                    .map((item) => (
+                  {/* Markers for merchants */}
+                  {safeData.merchants
+                    .filter(merchant => merchant.location && typeof merchant.location.lat === 'number' && typeof merchant.location.lng === 'number')
+                    .map((merchant) => (
                       <Marker
-                        key={item.id}
-                        position={[item.location.lat, item.location.lng]}
-                        icon={createIcon(item.online ? '#00ff00' : '#ff0000')}
+                        key={merchant.id}
+                        position={[merchant.location.lat, merchant.location.lng]}
+                        icon={createIcon('#0066ff')}
                       >
                         <Popup>
-                          <strong>{item.name || 'Motoboy'}</strong><br />
-                          Status: {item.online ? 'Online' : 'Offline'}<br />
-                          {item.saldo && `Saldo: R$${item.saldo}`}<br />
-                          {item.placa && `Placa: ${item.placa}`}
+                          <strong>🏪 {merchant.name || merchant.id || 'Merchant'}</strong><br />
+                          Tipo: Merchant<br />
+                          {merchant.logradouro && `Endereço: ${merchant.logradouro}${merchant.numero ? ', ' + merchant.numero : ''}`}<br />
+                          {merchant.cidade && `Cidade: ${merchant.cidade} - ${merchant.estado || ''}`}<br />
+                          {merchant.phone && `Tel: ${merchant.phone}`}
                         </Popup>
                       </Marker>
                     ))}
 
+                  {/* Markers for current motoboys */}
+                  {safeData.current
+                    .filter(item => {
+                      if (!item.location) return false;
+                      const lat = item.location.lat ?? item.location.latitude;
+                      const lng = item.location.lng ?? item.location.longitude;
+                      return typeof lat === 'number' && typeof lng === 'number';
+                    })
+                    .map((item) => {
+                      const lat = item.location.lat ?? item.location.latitude;
+                      const lng = item.location.lng ?? item.location.longitude;
+                      return (
+                        <Marker
+                          key={item.id}
+                          position={[lat, lng]}
+                          icon={createIcon(item.online ? '#00ff00' : '#ff0000')}
+                        >
+                          <Popup>
+                            <strong>{item.name || 'Motoboy'}</strong><br />
+                            Status: {item.online ? 'Online' : 'Offline'}<br />
+                            {item.saldo && `Saldo: R$${item.saldo}`}<br />
+                            {item.placa && `Placa: ${item.placa}`}
+                          </Popup>
+                        </Marker>
+                      );
+                    })}
+
                   {/* Markers for users with location */}
                   {safeData.users
-                    .filter(user => user.location && typeof user.location.lat === 'number' && typeof user.location.lng === 'number')
-                    .map((user) => (
-                      <Marker
-                        key={user.id}
-                        position={[user.location.lat, user.location.lng]}
-                        icon={createIcon(user.role === 'motoboy' ? (user.online ? '#00ff00' : '#ff0000') : '#ffa500')}
-                      >
-                        <Popup>
-                          <strong>{user.name || (user.role === 'motoboy' ? 'Motoboy' : 'Restaurante')}</strong><br />
-                          {user.role === 'motoboy' ? (
-                            <div style={{ display: 'contents' }}>
-                              Status: {user.online ? 'Online' : 'Offline'}<br />
-                              {user.saldo && `Saldo: R$${user.saldo}`}<br />
-                              {user.placa && `Placa: ${user.placa}`}<br />
-                              {user.Historico && user.Historico.length > 0 && (
-                                <div>
-                                  <br /><strong>Histórico:</strong>
-                                  <ul>
-                                    {user.Historico.slice(0, 5).map((hist, idx) =>
-                                      <li key={idx}>{hist}</li>
-                                    )}
-                                  </ul>
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <div style={{ display: 'contents' }}>
-                              {user.cidade && `Cidade: ${user.cidade}`}<br />
-                              {user.logradouro && `Endereço: ${user.logradouro}`}
-                            </div>
-                          )}
-                        </Popup>
-                      </Marker>
-                    ))}
+                    .filter(user => {
+                      if (!user.location) return false;
+                      const lat = user.location.lat ?? user.location.latitude;
+                      const lng = user.location.lng ?? user.location.longitude;
+                      return typeof lat === 'number' && typeof lng === 'number';
+                    })
+                    .map((user) => {
+                      const lat = user.location.lat ?? user.location.latitude;
+                      const lng = user.location.lng ?? user.location.longitude;
+                      return (
+                        <Marker
+                          key={user.id}
+                          position={[lat, lng]}
+                          icon={createIcon(user.role === 'motoboy' ? (user.online ? '#00ff00' : '#ff0000') : '#ffa500')}
+                        >
+                          <Popup>
+                            <strong>{user.name || (user.role === 'motoboy' ? 'Motoboy' : 'Restaurante')}</strong><br />
+                            {user.role === 'motoboy' ? (
+                              <div style={{ display: 'contents' }}>
+                                Status: {user.online ? 'Online' : 'Offline'}<br />
+                                {user.saldo && `Saldo: R$${user.saldo}`}<br />
+                                {user.placa && `Placa: ${user.placa}`}<br />
+                                {user.Historico && user.Historico.length > 0 && (
+                                  <div>
+                                    <br /><strong>Histórico:</strong>
+                                    <ul>
+                                      {user.Historico.slice(0, 5).map((hist, idx) =>
+                                        <li key={idx}>{hist}</li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div style={{ display: 'contents' }}>
+                                {user.cidade && `Cidade: ${user.cidade}`}<br />
+                                {user.logradouro && `Endereço: ${user.logradouro}`}
+                              </div>
+                            )}
+                          </Popup>
+                        </Marker>
+                      );
+                    })}
                 </MapContainer>
               </div>
             </div>
