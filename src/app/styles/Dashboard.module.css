@@ -1,0 +1,262 @@
+.dashboardContainer {
+  min-height: 100vh;
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Inter', 'Poppins', sans-serif;
+  padding: 2rem;
+  overflow-x: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #00f7ff, #7000ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logoutButton {
+  padding: 0.6rem 1.2rem;
+  background: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.logoutButton:hover {
+  background: #ff4444;
+  color: #ffffff;
+}
+
+/* Stat Cards */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 247, 255, 0.3);
+}
+
+.statLabel {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.statTrend {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Main Content Grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Merchant List */
+.merchantList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.merchantItem {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.merchantItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.merchantInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.merchantName {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.merchantSub {
+  font-size: 0.8rem;
+  color: #808080;
+  margin-top: 2px;
+}
+
+.merchantStats {
+  text-align: right;
+}
+
+.merchantOrders {
+  font-weight: 700;
+  color: #00f7ff;
+}
+
+.merchantRevenue {
+  font-size: 0.85rem;
+  color: #44ff44;
+}
+
+/* Motoboy List */
+.motoboyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.motoboyItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+}
+
+.statusIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentcolor;
+}
+
+.online {
+  background: #44ff44;
+  color: rgba(68, 255, 68, 0.5);
+}
+
+.offline {
+  background: #ff4444;
+  color: rgba(255, 68, 68, 0.5);
+}
+
+.motoboyDetails {
+  flex: 1;
+}
+
+.motoboyName {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.motoboyMeta {
+  font-size: 0.75rem;
+  color: #808080;
+}
+
+/* Map Section */
+.mapContainer {
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mapStats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.mapStatItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+}
+
+/* Scrollbar */
+.merchantList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.merchantList::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.merchantList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.merchantList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
