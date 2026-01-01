@@ -331,7 +331,16 @@ export default function RestaurantDashboard() {
             <h1 className={dashStyles.title}>Monitoramento Global</h1>
             <p style={{ fontSize: '0.85rem', color: '#808080' }}>Visualização analítica do ecossistema Auuii</p>
           </div>
-          <button onClick={handleLogout} className={dashStyles.logoutButton}>Sign Out</button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              onClick={() => window.location.href = '/auuii/notifications'}
+              className={dashStyles.logoutButton}
+              style={{ background: 'linear-gradient(135deg, #00f7ff 0%, #0099ff 100%)', color: '#000' }}
+            >
+              🔔 Notificações
+            </button>
+            <button onClick={handleLogout} className={dashStyles.logoutButton}>Sign Out</button>
+          </div>
         </header>
 
         <section className={dashStyles.statsGrid}>
