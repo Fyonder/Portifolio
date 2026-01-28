@@ -5,9 +5,9 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <Link href="/auuii" className={styles.title}>
-        Filipe Souza
-          </Link>
+        <h1 className={styles.title}>
+          Filipe Souza
+        </h1>
         <p className={styles.subtitle}>
           Desenvolvedor apaixonado por criar experiências digitais incríveis ✨
         </p>
@@ -16,8 +16,8 @@ export default function Home() {
         </Link>
 
         <Link href="/contato" className={styles.button}>
-            Entre em Contato
-          </Link>
+          Entre em Contato
+        </Link>
 
       </header>
 
@@ -33,8 +33,8 @@ export default function Home() {
       <section className={styles.projects}>
         <h2 className={styles.sectionTitle}>Meus Projetos</h2>
         <div className={styles.projectGrid}>
-        
-        <div className={styles.projectCard}>
+
+          <div className={styles.projectCard}>
             <h3 className={styles.projectTitle}>Auuii Delivery</h3>
             <p className={styles.projectDescription}>
               Plataforma de delivery em React e Next.js, com design moderno e funcionalidades avançadas.
