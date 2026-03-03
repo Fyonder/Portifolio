@@ -40,7 +40,7 @@ export default function Home() {
               Plataforma de delivery em React e Next.js, com design moderno e funcionalidades avançadas.
             </p>
             <a
-              href="https://auuii.cosm"
+              href="https://auuii.com"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.projectLink}
